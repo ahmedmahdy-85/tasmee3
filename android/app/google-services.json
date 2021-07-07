@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "97219271243",
+    "project_id": "tasmee3-ad554",
+    "storage_bucket": "tasmee3-ad554.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:97219271243:android:a542444afe228d966fcbce",
+        "android_client_info": {
+          "package_name": "com.quran.tasmee3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "97219271243-05tubm25unvnrn1inc57i170fkl4879u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quran.tasmee3",
+            "certificate_hash": "de61f3fb1c0a00e0ff992aafd7ce7666e038e8a7"
+          }
+        },
+        {
+          "client_id": "97219271243-fc7cb4trh7ainemkp51rmfhb2oq54ifj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvq_MHBnsZlNUsmTtkkwCQ1gdyhW35HOY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "97219271243-fc7cb4trh7ainemkp51rmfhb2oq54ifj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
