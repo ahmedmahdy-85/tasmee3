@@ -148,13 +148,13 @@ class StudentReviewViewModel extends GetxController {
         value.docs.forEach((element) {
           if (element.data().isNotEmpty) {
             StudentModel s = StudentModel.fromJson(element.data());
-            String str = s.name;
+            String str = s.name.trim();
             if (!studentsNames.contains(str)) {
               studentsNames.add(str);
             }
           }
         });
-        studentsNames.toSet();
+        studentsNames.sort();
       }
     });
 

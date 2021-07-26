@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ProgressModel implements Comparable<ProgressModel> {
   String status;
   String studentName;
@@ -10,12 +12,9 @@ class ProgressModel implements Comparable<ProgressModel> {
   int year;
   int completeWithPunish;
   String uncompleteTasmee3Details;
-  String time;
-  String action;
 
   ProgressModel(
       {this.studentName,
-      this.action,
       this.completeWithPunish,
       this.status,
       this.noTasmee3,
@@ -25,7 +24,6 @@ class ProgressModel implements Comparable<ProgressModel> {
       this.complete,
       this.day,
       this.month,
-      this.time,
       this.year});
 
   @override
@@ -54,8 +52,6 @@ class ProgressModel implements Comparable<ProgressModel> {
     month = map['month'];
     year = map['year'];
     uncompleteTasmee3Details = map['uncompletDetails'];
-    time = map['time'];
-    action = map['action'];
   }
 
   toJson() {
@@ -71,8 +67,6 @@ class ProgressModel implements Comparable<ProgressModel> {
       'month': month,
       'year': year,
       'uncompletDetails': uncompleteTasmee3Details,
-      'time': time,
-      'action': action,
     };
   }
 }

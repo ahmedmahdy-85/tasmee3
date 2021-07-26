@@ -219,6 +219,7 @@ class AdminViewModel extends GetxController {
                 token: '',
                 groupName: groupNameController.text,
                 goal: '',
+                activeDay: 0,
                 phone: registerUserName));
         id = Uuid().v4();
         groupNameController.clear();

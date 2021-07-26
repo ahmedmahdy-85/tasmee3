@@ -3,8 +3,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
    <application
-        android:label="حصون"
-        android:icon="@mipmap/ic_launcher">
+       android:label="حصون"
+       android:allowBackup="false"
+       android:icon="@mipmap/ic_launcher">
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

@@ -60,8 +60,7 @@ class TeacherDayStatisticsViewModel extends GetxController {
     await getCurrentUserData();
     await getGroupName();
     await getCurrentDate();
-    await getStatisticsPerDay(
-        currentDate.day, currentDate.month, currentDate.year, teacherId);
+    await getStatisticsPerDay(dateController.text, teacherId);
   }
 
   void setClickable() {
@@ -85,8 +84,7 @@ class TeacherDayStatisticsViewModel extends GetxController {
     update();
   }
 
-  Future<void> getStatisticsPerDay(
-      int day, int month, int year, String teacherId) async {
+  Future<void> getStatisticsPerDay(String date, String teacherId) async {
     _loading.value = true;
     noTasmee3 = 0;
     uncomplete = 0;
@@ -98,31 +96,29 @@ class TeacherDayStatisticsViewModel extends GetxController {
         .collection('StudentsList')
         .get()
         .then((value) {
-      value.docs.forEach((element) async {
-        await element.reference
-            .collection('ProgressList')
-            .where('year', isEqualTo: year)
-            .where('month', isEqualTo: month)
-            .where('day', isEqualTo: day)
-            .get()
-            .then((value) {
-          progress = value.docs.map((e) {
-            ProgressModel newProgress =
-                ProgressModel.fromJson(Map<String, dynamic>.from(e.data()));
-            return newProgress;
-          }).toList();
-          for (ProgressModel p in progress) {
-            completeWithPunish += p.completeWithPunish;
-
-            noTasmee3 += p.noTasmee3;
-            complete += p.complete;
-            uncomplete += p.uncomplete;
-            update();
-          }
+      if (value != null) {
+        value.docs.forEach((element) async {
+          await element.reference
+              .collection('ProgressList')
+              .where('date', isEqualTo: date)
+              .get()
+              .then((value) {
+            progress = value.docs.map((e) {
+              ProgressModel newProgress =
+                  ProgressModel.fromJson(Map<String, dynamic>.from(e.data()));
+              return newProgress;
+            }).toList();
+            for (ProgressModel p in progress) {
+              completeWithPunish += p.completeWithPunish;
+              noTasmee3 += p.noTasmee3;
+              complete += p.complete;
+              uncomplete += p.uncomplete;
+              update();
+            }
+          });
         });
-      });
+      }
     });
-
     _loading.value = false;
     update();
   }
@@ -144,13 +140,11 @@ class TeacherDayStatisticsViewModel extends GetxController {
 
     if (newDate == null) return;
     selectedDate = newDate;
-
-    await getCurrentUserData();
-    await getStatisticsPerDay(
-        selectedDate.day, selectedDate.month, selectedDate.year, teacherId);
-    generateData();
-    await Jiffy.locale("ar");
     dateController.text = Jiffy(selectedDate).format("do MMMM yyyy");
+    await getCurrentUserData();
+    await Jiffy.locale("ar");
+    await getStatisticsPerDay(dateController.text, teacherId);
+    generateData();
     update();
   }
 

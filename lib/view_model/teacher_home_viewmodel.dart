@@ -48,7 +48,7 @@ class TeacherViewModel extends GetxController {
     await getCurrentUserData();
     await getGroupName();
     await getDateRangeFromFireStore();
-    await checkDayAction(DateTime.now());
+    await checkTaskDone();
     await setTokenToFirestore();
   }
 
@@ -194,61 +194,52 @@ class TeacherViewModel extends GetxController {
     update();
   }
 
-  Future<void> checkDayAction(DateTime now) async {
+  Future<void> checkDayAction(DateTime day) async {
     _loading.value = true;
-    try {
-      await _studentsCollection
-          .doc(userId)
-          .collection('StudentsList')
-          .get()
-          .then((value) {
-        if (value.docs.isNotEmpty && value.docs.length > 0) {
-          value.docs.forEach((element) async {
-            if (element.data().isNotEmpty) {
-              await element.reference
-                  .collection('ProgressList')
-                  .where('year', isEqualTo: now.year)
-                  .where('month', isEqualTo: now.month)
-                  .where('day', isEqualTo: now.day)
-                  .get()
-                  .then((value) async {
-                if (value.docs.isEmpty && value.docs.length == 0) {
-                  DateTime utc = DateTime.now().toUtc();
-                  await Jiffy.locale("ar");
-                  String date = Jiffy(now).format("do MMMM yyyy");
-                  await FireStoreUser().addProgressToFirestore(
-                      ProgressModel(
-                          completeWithPunish: 0,
-                          noTasmee3: 1,
-                          uncomplete: 0,
-                          studentName: element.get('name'),
-                          uncompleteTasmee3Details: '',
-                          complete: 0,
-                          status: 'عدم تسميع',
-                          day: now.day,
-                          month: now.month,
-                          year: now.year,
-                          date: date,
-                          time: '${utc.hour}:${utc.minute}'),
-                      userId,
-                      element.reference.id,
-                      id);
-                }
-              });
-            }
-
-            id = Uuid().v4();
-          });
-        }
+    await _studentsCollection
+        .doc(userId)
+        .collection('StudentsList')
+        .get()
+        .then((value) async {
+      if (value.docs.isNotEmpty && value.docs.length > 0) {
+        await Jiffy.locale("ar");
+        String date = Jiffy(day).format("do MMMM yyyy");
+        value.docs.forEach((element) async {
+          if (element.data().isNotEmpty) {
+            await element.reference
+                .collection('ProgressList')
+                .where('date', isEqualTo: date)
+                .get()
+                .then((value) async {
+              if (value.docs.isEmpty && value.docs.length == 0) {
+                await FireStoreUser().addProgressToFirestore(
+                    ProgressModel(
+                      completeWithPunish: 0,
+                      noTasmee3: 1,
+                      uncomplete: 0,
+                      studentName: element.get('name'),
+                      uncompleteTasmee3Details: '',
+                      complete: 0,
+                      status: 'عدم تسميع',
+                      day: day.day,
+                      month: day.month,
+                      year: day.year,
+                      date: date,
+                    ),
+                    userId,
+                    element.reference.id,
+                    '${day.day}' + '${day.month}' + '${day.year}');
+              }
+            });
+          }
+        });
+      }
+    }).then((value) async {
+      await deactivateAfterTask().then((value) {
+        _loading.value = false;
+        update();
       });
-      _loading.value = false;
-      update();
-    } catch (e) {
-      _loading.value = false;
-      update();
-      Get.snackbar('تعذر تحديث البيانات', 'يوجد مشكلة في الاتصال بالانترنت',
-          colorText: Colors.black, snackPosition: SnackPosition.BOTTOM);
-    }
+    });
   }
 
   Future<bool> backToAdminScreen() async {
@@ -307,5 +298,35 @@ class TeacherViewModel extends GetxController {
     });
     _loading.value = false;
     update();
+  }
+
+  Future<void> checkTaskDone() async {
+    _loading.value = true;
+    await _teachersCollection
+        .doc('admin@123456')
+        .collection('TeachersList')
+        .doc(userId)
+        .get()
+        .then((value) async {
+      if (value != null) {
+        if (value.get('activeDay') != DateTime.now().day) {
+          await checkDayAction(DateTime.now());
+        }
+      }
+    });
+    _loading.value = false;
+    update();
+  }
+
+  Future<void> deactivateAfterTask() async {
+    _loading.value = true;
+    await _teachersCollection
+        .doc('admin@123456')
+        .collection('TeachersList')
+        .doc(userId)
+        .update({'activeDay': DateTime.now().day}).then((value) {
+      _loading.value = false;
+      update();
+    });
   }
 }

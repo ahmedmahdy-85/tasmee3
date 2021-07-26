@@ -123,226 +123,203 @@ class MyGroup extends StatelessWidget {
                   ),
                 ),
                 body: Container(
-                  padding: EdgeInsets.all(5.0),
+                  padding: EdgeInsets.only(top: 5.0),
                   child: Column(
                     children: [
                       Expanded(
-                          child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: !controller.isSearch
-                                  ? ListView.separated(
-                                      scrollDirection: Axis.vertical,
-                                      separatorBuilder: (context, index) =>
-                                          Divider(),
-                                      itemBuilder: (context, index) {
-                                        return GestureDetector(
-                                          onTap: () => Get.to(() =>
-                                              ManageStudents(
-                                                  teacherId: currentUser.id,
-                                                  studentId: controller
-                                                      .students[index].id)),
-                                          onLongPress: () {
-                                            controller.onSelected(index);
-                                            controller.setDeletable();
-                                            controller.setStudentId(
-                                                controller.students[index].id);
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.all(5.0),
-                                            decoration: BoxDecoration(
-                                              color: controller.deletable &&
-                                                      controller.i == index
-                                                  ? Colors.grey
-                                                  : Colors.white,
+                          child: !controller.isSearch
+                              ? ListView.separated(
+                                  scrollDirection: Axis.vertical,
+                                  separatorBuilder: (context, index) =>
+                                      Divider(),
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () => Get.to(() => ManageStudents(
+                                          teacherId: currentUser.id,
+                                          studentId:
+                                              controller.students[index].id)),
+                                      onLongPress: () {
+                                        controller.onSelected(index);
+                                        controller.setDeletable();
+                                        controller.setStudentId(
+                                            controller.students[index].id);
+                                      },
+                                      child: Container(
+                                        //padding: EdgeInsets.all(5.0),
+                                        decoration: BoxDecoration(
+                                          color: controller.deletable &&
+                                                  controller.i == index
+                                              ? Colors.grey
+                                              : Colors.white,
+                                        ),
+                                        height: 80.0,
+                                        child: Center(
+                                          child: ListTile(
+                                            leading: CustomButton(
+                                              textColor: Colors.white,
+                                              buttonColor: controller
+                                                      .students[index].isActive
+                                                  ? primaryColor
+                                                  : accentColor,
+                                              width: 100.0,
+                                              text: controller
+                                                      .students[index].isActive
+                                                  ? 'توقيف'
+                                                  : 'تفعيل',
+                                              height: 42.0,
+                                              fontSize: 14.0,
+                                              onPressed: () async {
+                                                try {
+                                                  final result =
+                                                      await InternetAddress
+                                                          .lookup('google.com');
+                                                  if (result.isNotEmpty &&
+                                                      result[0]
+                                                          .rawAddress
+                                                          .isNotEmpty) {
+                                                    await controller
+                                                        .updateStudentStatus(
+                                                            controller
+                                                                .students[index]
+                                                                .id,
+                                                            currentUser.id,
+                                                            index);
+                                                  }
+                                                } on SocketException catch (_) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                          controller.snackBar2);
+                                                }
+                                              },
                                             ),
-                                            height: 80.0,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                CustomButton(
-                                                  textColor: Colors.white,
-                                                  buttonColor: controller
-                                                          .students[index]
-                                                          .isActive
-                                                      ? primaryColor
-                                                      : accentColor,
-                                                  width: 100.0,
-                                                  text: controller
-                                                          .students[index]
-                                                          .isActive
-                                                      ? 'توقيف'
-                                                      : 'تفعيل',
-                                                  height: 42.0,
-                                                  fontSize: 14.0,
-                                                  onPressed: () async {
-                                                    try {
-                                                      final result =
-                                                          await InternetAddress
-                                                              .lookup(
-                                                                  'google.com');
-                                                      if (result.isNotEmpty &&
-                                                          result[0]
-                                                              .rawAddress
-                                                              .isNotEmpty) {
-                                                        await controller
-                                                            .updateStudentStatus(
-                                                                controller
-                                                                    .students[
-                                                                        index]
-                                                                    .id,
-                                                                currentUser.id,
-                                                                index);
-                                                      }
-                                                    } on SocketException catch (_) {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                              controller
-                                                                  .snackBar2);
-                                                    }
-                                                  },
-                                                ),
-                                                Text(
-                                                  controller
-                                                      .students[index].name,
-                                                  textDirection:
-                                                      TextDirection.rtl,
-                                                  style: TextStyle(
-                                                    fontSize: 16.0,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                CircleAvatar(
-                                                  backgroundColor:
-                                                      Colors.grey.shade200,
-                                                  radius: 35.0,
-                                                  child: Text(
-                                                    controller
-                                                        .students[index].name
-                                                        .trim()
-                                                        .substring(0, 1),
-                                                    style: TextStyle(
-                                                        fontSize: 25.0,
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                )
-                                              ],
+                                            title: Text(
+                                              controller.students[index].name
+                                                  .trim(),
+                                              textDirection: TextDirection.rtl,
+                                              style: TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            trailing: CircleAvatar(
+                                              backgroundColor:
+                                                  Colors.grey.shade200,
+                                              radius: 35.0,
+                                              child: Text(
+                                                controller.students[index].name
+                                                    .trim()
+                                                    .substring(0, 1),
+                                                style: TextStyle(
+                                                    fontSize: 25.0,
+                                                    color: primaryColor,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
                                             ),
                                           ),
-                                        );
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: controller.students.length)
+                              : ListView.separated(
+                                  scrollDirection: Axis.vertical,
+                                  separatorBuilder: (context, index) =>
+                                      Divider(),
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () => Get.to(() => ManageStudents(
+                                          teacherId: currentUser.id,
+                                          studentId:
+                                              controller.searchList[index].id)),
+                                      onLongPress: () {
+                                        controller.onSelected(index);
+                                        controller.setDeletable();
+                                        controller.setStudentId(
+                                            controller.searchList[index].id);
                                       },
-                                      itemCount: controller.students.length)
-                                  : ListView.separated(
-                                      scrollDirection: Axis.vertical,
-                                      separatorBuilder: (context, index) =>
-                                          Divider(),
-                                      itemBuilder: (context, index) {
-                                        return GestureDetector(
-                                          onTap: () => Get.to(() =>
-                                              ManageStudents(
-                                                  teacherId: currentUser.id,
-                                                  studentId: controller
-                                                      .searchList[index].id)),
-                                          onLongPress: () {
-                                            controller.onSelected(index);
-                                            controller.setDeletable();
-                                            controller.setStudentId(controller
-                                                .searchList[index].id);
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.all(5.0),
-                                            decoration: BoxDecoration(
-                                              color: controller.deletable &&
-                                                      controller.i == index
-                                                  ? Colors.grey
-                                                  : Colors.white,
+                                      child: Container(
+                                        padding: EdgeInsets.all(5.0),
+                                        decoration: BoxDecoration(
+                                          color: controller.deletable &&
+                                                  controller.i == index
+                                              ? Colors.grey
+                                              : Colors.white,
+                                        ),
+                                        height: 80.0,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            CustomButton(
+                                              textColor: Colors.white,
+                                              buttonColor: controller
+                                                      .searchList[index]
+                                                      .isActive
+                                                  ? primaryColor
+                                                  : accentColor,
+                                              width: 100.0,
+                                              text: controller.searchList[index]
+                                                      .isActive
+                                                  ? 'توقيف'
+                                                  : 'تفعيل',
+                                              height: 42.0,
+                                              fontSize: 14.0,
+                                              onPressed: () async {
+                                                try {
+                                                  final result =
+                                                      await InternetAddress
+                                                          .lookup('google.com');
+                                                  if (result.isNotEmpty &&
+                                                      result[0]
+                                                          .rawAddress
+                                                          .isNotEmpty) {
+                                                    await controller
+                                                        .updateStatusInSearchList(
+                                                            controller
+                                                                .searchList[
+                                                                    index]
+                                                                .id,
+                                                            currentUser.id,
+                                                            index);
+                                                  }
+                                                } on SocketException catch (_) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                          controller.snackBar2);
+                                                }
+                                              },
                                             ),
-                                            height: 80.0,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                CustomButton(
-                                                  textColor: Colors.white,
-                                                  buttonColor: controller
-                                                          .searchList[index]
-                                                          .isActive
-                                                      ? primaryColor
-                                                      : accentColor,
-                                                  width: 100.0,
-                                                  text: controller
-                                                          .searchList[index]
-                                                          .isActive
-                                                      ? 'توقيف'
-                                                      : 'تفعيل',
-                                                  height: 42.0,
-                                                  fontSize: 14.0,
-                                                  onPressed: () async {
-                                                    try {
-                                                      final result =
-                                                          await InternetAddress
-                                                              .lookup(
-                                                                  'google.com');
-                                                      if (result.isNotEmpty &&
-                                                          result[0]
-                                                              .rawAddress
-                                                              .isNotEmpty) {
-                                                        await controller
-                                                            .updateStatusInSearchList(
-                                                                controller
-                                                                    .searchList[
-                                                                        index]
-                                                                    .id,
-                                                                currentUser.id,
-                                                                index);
-                                                      }
-                                                    } on SocketException catch (_) {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                              controller
-                                                                  .snackBar2);
-                                                    }
-                                                  },
-                                                ),
-                                                Text(
-                                                  controller
-                                                      .searchList[index].name,
-                                                  textDirection:
-                                                      TextDirection.rtl,
-                                                  style: TextStyle(
-                                                    fontSize: 16.0,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                CircleAvatar(
-                                                  backgroundColor:
-                                                      Colors.grey.shade200,
-                                                  radius: 35.0,
-                                                  child: Text(
-                                                    controller
-                                                        .searchList[index].name
-                                                        .trim()
-                                                        .substring(0, 1),
-                                                    style: TextStyle(
-                                                        fontSize: 25.0,
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                )
-                                              ],
+                                            Text(
+                                              controller.searchList[index].name,
+                                              textDirection: TextDirection.rtl,
+                                              style: TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                          ),
-                                        );
-                                      },
-                                      itemCount:
-                                          controller.searchList.length))),
+                                            CircleAvatar(
+                                              backgroundColor:
+                                                  Colors.grey.shade200,
+                                              radius: 35.0,
+                                              child: Text(
+                                                controller
+                                                    .searchList[index].name
+                                                    .trim()
+                                                    .substring(0, 1),
+                                                style: TextStyle(
+                                                    fontSize: 25.0,
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: controller.searchList.length)),
                     ],
                   ),
                 ),

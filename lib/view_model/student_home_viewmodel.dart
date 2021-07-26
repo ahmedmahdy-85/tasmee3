@@ -117,34 +117,32 @@ class StudentViewModel extends GetxController {
   }
 
   Future<void> addUncompleteTasmee3() async {
+    setLoading();
     if (uncompleteDetailsController.text.isNotEmpty) {
-      setLoading();
-      DateTime utc = DateTime.now().toUtc();
-      ProgressModel p = ProgressModel(
-          uncompleteTasmee3Details: uncompleteDetailsController.text,
-          completeWithPunish: 0,
-          noTasmee3: 0,
-          uncomplete: 1,
-          studentName: name,
-          complete: 0,
-          status: 'تم ناقص',
-          day: currentDate.day,
-          month: currentDate.month,
-          year: currentDate.year,
-          action: 'add',
-          date: Jiffy(DateTime.now()).format("do MMMM yyyy").toString(),
-          time: '${utc.hour}:${utc.minute}');
       await Jiffy.locale("ar");
-      await _studentsCollection
-          .doc(teacherId)
-          .collection('StudentsList')
-          .doc(userId)
-          .collection('ProgressList')
-          .where('year', isEqualTo: currentDate.year)
-          .where('month', isEqualTo: currentDate.month)
-          .where('day', isEqualTo: currentDate.day)
-          .get()
+      ProgressModel p = ProgressModel(
+        uncompleteTasmee3Details: uncompleteDetailsController.text,
+        completeWithPunish: 0,
+        noTasmee3: 0,
+        uncomplete: 1,
+        day: currentDate.day,
+        month: currentDate.month,
+        year: currentDate.year,
+        studentName: name,
+        complete: 0,
+        status: 'تم ناقص',
+        date: Jiffy(DateTime.now()).format("do MMMM yyyy").toString(),
+      );
+      await FireStoreUser()
+          .addProgressToFirestore(
+              p,
+              teacherId,
+              userId,
+              '${DateTime.now().day}' +
+                  '${DateTime.now().month}' +
+                  '${DateTime.now().year}')
           .then((value) async {
+        await Jiffy.locale("ar");
         await _studentsCollection
             .doc(teacherId)
             .collection('StudentsList')
@@ -153,224 +151,117 @@ class StudentViewModel extends GetxController {
           'uncompleteTasmee3Details': uncompleteDetailsController.text,
           'status': 'تم ناقص',
           'uncompleteTasmee3Date': Jiffy(DateTime.now()).format("do MMMM yyyy"),
+        }).then((value) async {
+          uncompleteDetailsController.clear();
+          canSendData = false;
+          await deactivateAfterAction();
+          _loading.value = false;
+          update();
+          Get.snackbar('تم الارسال', 'تم تحديث البيانات بنجاح',
+              colorText: Colors.black, snackPosition: SnackPosition.BOTTOM);
         });
-        if (value.docs.isNotEmpty && value.docs.length > 0) {
-          value.docs.forEach((element) async {
-            if (element.data().isNotEmpty) {
-              await _studentsCollection
-                  .doc(teacherId)
-                  .collection('StudentsList')
-                  .doc(userId)
-                  .collection('ProgressList')
-                  .doc(element.reference.id)
-                  .update({
-                'uncompleteDetails': uncompleteDetailsController.text,
-                'completeWithPunish': 0,
-                'noTasmee3': 0,
-                'uncomplete': 1,
-                'studentName': name,
-                'complete': 0,
-                'status': 'تم ناقص',
-                'day': currentDate.day,
-                'month': currentDate.month,
-                'year': currentDate.year,
-                'date': Jiffy(DateTime.now()).format("do MMMM yyyy").toString(),
-                'time': '${utc.hour}:${utc.minute}',
-                'action': 'update',
-              });
-            }
-          });
-        } else {
-          await Jiffy.locale("ar");
-          await FireStoreUser()
-              .addProgressToFirestore(p, teacherId, userId, id);
-        }
-      }).then((value) async {
-        uncompleteDetailsController.clear();
-        id = Uuid().v4();
-        canSendData = false;
-        await deactivateAfterAction();
-        _loading.value = false;
-        update();
-        Get.snackbar('تم الارسال', 'تم تحديث البيانات بنجاح',
-            colorText: Colors.black, snackPosition: SnackPosition.BOTTOM);
-      }).catchError((error) {
-        print(error);
-        _loading.value = false;
-        update();
-        Get.snackbar('تعذر تحديث البيانات', 'يوجد مشكلة في الاتصال بالانترنت',
-            colorText: Colors.black, snackPosition: SnackPosition.BOTTOM);
       });
     } else {
+      _loading.value = false;
+      update();
       globalKey.currentState.showSnackBar(snackBar3);
     }
   }
 
   Future<void> addCompleteWithPunish() async {
+    setLoading();
     if (goalController.text.isNotEmpty) {
-      setLoading();
       await Jiffy.locale("ar");
-      DateTime utc = DateTime.now().toUtc();
       ProgressModel p = ProgressModel(
-          complete: 0,
-          completeWithPunish: 1,
-          noTasmee3: 0,
-          uncomplete: 0,
-          studentName: name,
-          uncompleteTasmee3Details: '',
-          status: 'تم كامل مع العقوبة',
-          day: currentDate.day,
-          action: 'add',
-          month: currentDate.month,
-          year: currentDate.year,
-          date: Jiffy(currentDate).format("do MMMM yyyy").toString(),
-          time: '${utc.hour}:${utc.minute}');
-      await _studentsCollection
-          .doc(teacherId)
-          .collection('StudentsList')
-          .doc(userId)
-          .collection('ProgressList')
-          .where('year', isEqualTo: currentDate.year)
-          .where('month', isEqualTo: currentDate.month)
-          .where('day', isEqualTo: currentDate.day)
-          .get()
+        complete: 0,
+        completeWithPunish: 1,
+        noTasmee3: 0,
+        uncomplete: 0,
+        studentName: name,
+        day: currentDate.day,
+        month: currentDate.month,
+        year: currentDate.year,
+        uncompleteTasmee3Details: '',
+        status: 'تم كامل مع العقوبة',
+        date: Jiffy(currentDate).format("do MMMM yyyy").toString(),
+      );
+      await FireStoreUser()
+          .addProgressToFirestore(
+              p,
+              teacherId,
+              userId,
+              '${DateTime.now().day}' +
+                  '${DateTime.now().month}' +
+                  '${DateTime.now().year}')
           .then((value) async {
+        await Jiffy.locale("ar");
         await _studentsCollection
             .doc(teacherId)
             .collection('StudentsList')
             .doc(userId)
-            .update({'status': 'تم كامل مع العقوبة'});
-        if (value.docs.isNotEmpty && value.docs.length > 0) {
-          value.docs.forEach((element) async {
-            if (element.data().isNotEmpty) {
-              await _studentsCollection
-                  .doc(teacherId)
-                  .collection('StudentsList')
-                  .doc(userId)
-                  .collection('ProgressList')
-                  .doc(element.reference.id)
-                  .update({
-                'uncompleteDetails': '',
-                'completeWithPunish': 1,
-                'noTasmee3': 0,
-                'uncomplete': 0,
-                'studentName': name,
-                'complete': 0,
-                'status': 'تم كامل مع العقوبة',
-                'day': currentDate.day,
-                'month': currentDate.month,
-                'action': 'update',
-                'year': currentDate.year,
-                'date': Jiffy(DateTime.now()).format("do MMMM yyyy").toString(),
-                'time': '${utc.hour}:${utc.minute}'
-              });
-            }
-          });
-        } else {
-          await Jiffy.locale("ar");
-          await FireStoreUser()
-              .addProgressToFirestore(p, teacherId, userId, id);
-        }
-      }).then((value) async {
-        _loading.value = false;
-        id = Uuid().v4();
-        await deactivateAfterAction();
-        _loading.value = false;
-        update();
-        Get.snackbar('تم الارسال', 'تم تحديث البيانات بنجاح',
-            colorText: Colors.black, snackPosition: SnackPosition.BOTTOM);
-      }).catchError((error) {
-        print(error);
-        update();
-        Get.snackbar('تعذر تحديث البيانات', 'يوجد مشكلة في الاتصال بالانترنت',
-            colorText: Colors.black, snackPosition: SnackPosition.BOTTOM);
+            .update({
+          'status': 'تم كامل مع العقوبة',
+        }).then((value) async {
+          canSendData = false;
+          await deactivateAfterAction();
+          _loading.value = false;
+          update();
+          Get.snackbar('تم الارسال', 'تم تحديث البيانات بنجاح',
+              colorText: Colors.black, snackPosition: SnackPosition.BOTTOM);
+        });
       });
     } else {
+      _loading.value = false;
+      update();
       globalKey.currentState.showSnackBar(snackBar4);
     }
   }
 
   Future<void> addTasmee3Koli() async {
+    setLoading();
     if (goalController.text.isNotEmpty) {
-      setLoading();
-      DateTime utc = DateTime.now().toUtc();
-      ProgressModel p = ProgressModel(
-          noTasmee3: 0,
-          completeWithPunish: 0,
-          complete: 1,
-          studentName: name,
-          uncompleteTasmee3Details: '',
-          uncomplete: 0,
-          status: 'تم كامل',
-          action: 'add',
-          day: currentDate.day,
-          month: currentDate.month,
-          year: currentDate.year,
-          date: Jiffy(currentDate).format("do MMMM yyyy").toString(),
-          time: '${utc.hour}:${utc.minute}');
       await Jiffy.locale("ar");
-      await _studentsCollection
-          .doc(teacherId)
-          .collection('StudentsList')
-          .doc(userId)
-          .collection('ProgressList')
-          .where('year', isEqualTo: currentDate.year)
-          .where('month', isEqualTo: currentDate.month)
-          .where('day', isEqualTo: currentDate.day)
-          .get()
+      ProgressModel p = ProgressModel(
+        noTasmee3: 0,
+        completeWithPunish: 0,
+        complete: 1,
+        studentName: name,
+        uncompleteTasmee3Details: '',
+        uncomplete: 0,
+        status: 'تم كامل',
+        day: currentDate.day,
+        month: currentDate.month,
+        year: currentDate.year,
+        date: Jiffy(currentDate).format("do MMMM yyyy").toString(),
+      );
+      await FireStoreUser()
+          .addProgressToFirestore(
+              p,
+              teacherId,
+              userId,
+              '${DateTime.now().day}' +
+                  '${DateTime.now().month}' +
+                  '${DateTime.now().year}')
           .then((value) async {
+        await Jiffy.locale("ar");
         await _studentsCollection
             .doc(teacherId)
             .collection('StudentsList')
             .doc(userId)
-            .update({'status': 'تم كامل'});
-        if (value.docs.isNotEmpty && value.docs.length > 0) {
-          value.docs.forEach((element) async {
-            if (element.data().isNotEmpty) {
-              await _studentsCollection
-                  .doc(teacherId)
-                  .collection('StudentsList')
-                  .doc(userId)
-                  .collection('ProgressList')
-                  .doc(element.reference.id)
-                  .update({
-                'uncompleteDetails': '',
-                'completeWithPunish': 0,
-                'noTasmee3': 0,
-                'uncomplete': 0,
-                'studentName': name,
-                'complete': 1,
-                'status': 'تم كامل',
-                'day': currentDate.day,
-                'month': currentDate.month,
-                'year': currentDate.year,
-                'action': 'update',
-                'date': Jiffy(DateTime.now()).format("do MMMM yyyy").toString(),
-                'time': '${utc.hour}:${utc.minute}'
-              });
-            }
-          });
-        } else {
-          await Jiffy.locale("ar");
-          await FireStoreUser()
-              .addProgressToFirestore(p, teacherId, userId, id);
-        }
-      }).then((value) async {
-        id = Uuid().v4();
-        canSendData = false;
-        await deactivateAfterAction();
-        _loading.value = false;
-        update();
-        Get.snackbar('تم الارسال', 'تم تحديث البيانات بنجاح',
-            colorText: Colors.black, snackPosition: SnackPosition.BOTTOM);
-      }).catchError((error) {
-        print(error);
-        _loading.value = false;
-        update();
-        Get.snackbar('تعذر تحديث البيانات', 'يوجد مشكلة في الاتصال بالانترنت',
-            colorText: Colors.black, snackPosition: SnackPosition.BOTTOM);
+            .update({
+          'status': 'تم كامل',
+        }).then((value) async {
+          canSendData = false;
+          await deactivateAfterAction();
+          _loading.value = false;
+          update();
+          Get.snackbar('تم الارسال', 'تم تحديث البيانات بنجاح',
+              colorText: Colors.black, snackPosition: SnackPosition.BOTTOM);
+        });
       });
     } else {
+      _loading.value = false;
+      update();
       globalKey.currentState.showSnackBar(snackBar4);
     }
   }
@@ -430,7 +321,7 @@ class StudentViewModel extends GetxController {
       'priority': 'high',
       "notification": {
         "title": 'حصون',
-        "body": '$name يود ان يبلغك بما لم يسمعه اليوم ',
+        "body": '$name تود ان تبلغك بما لم تسمعه اليوم ',
       },
       "collapse_key": "type_a",
     };

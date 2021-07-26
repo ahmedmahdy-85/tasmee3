@@ -32,14 +32,18 @@ class FireStoreUser {
     return await _usersCollection.doc(userModel.id).set(userModel.toJson());
   }
 
-  Future<void> addProgressToFirestore(ProgressModel progress, String teacherId,
-      String studentId, String id) async {
-    return await _studentCollection
+  Future<void> addProgressToFirestore(
+    ProgressModel progress,
+    String teacherId,
+    String studentId,
+    String documentId,
+  ) async {
+    await _studentCollection
         .doc(teacherId)
         .collection('StudentsList')
         .doc(studentId)
         .collection('ProgressList')
-        .doc(id)
+        .doc(documentId)
         .set(progress.toJson());
   }
 

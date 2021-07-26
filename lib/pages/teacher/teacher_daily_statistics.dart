@@ -69,7 +69,7 @@ class DailyStatistics extends StatelessWidget {
                                                     controller.snackBar);
                                           }
                                         }
-                                      : null,
+                                      : () => print(''),
                                   child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,

@@ -8,10 +8,12 @@ class TeacherModel {
   String endOfGoal;
   String groupName;
   String token;
+  int activeDay;
 
   TeacherModel(
       {this.goal,
       this.groupName,
+      this.activeDay,
       this.endOfGoal,
       this.startOfGoal,
       this.username,
@@ -33,6 +35,7 @@ class TeacherModel {
     token = map['token'];
     startOfGoal = map['startOfGoal'];
     endOfGoal = map['endOfGoal'];
+    activeDay = map['activeDay'];
   }
 
   toJson() {
@@ -46,6 +49,7 @@ class TeacherModel {
       'token': token,
       'startOfGoal': startOfGoal,
       'endOfGoal': endOfGoal,
+      'activeDay': activeDay,
     };
   }
 }
